@@ -116,6 +116,7 @@ h2 {
 .screenimg {
   object-fit: contain;
   margin: auto;
+  max-width: 512px;
 }
 .screenshot {
 	z-index: 0;
