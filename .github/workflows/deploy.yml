@@ -3,7 +3,7 @@ name: Deploy HTML to Server
 on:
   push:
     branches:
-      - master
+      - master # Change to your default branch if different
 
 jobs:
   deploy:
@@ -14,12 +14,33 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup SSH
+        id: setup-ssh
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Copy files via SCP
-        run: scp -o StrictHostKeyChecking=no -P 21098 -r ./ benmbrym@68.65.122.80:/home/benmbrym/test
+      - name: Archive files
+        run: |
+          echo "Archiving files"
+          tar czf deploy.tar.gz .
 
-    # - name: SSH Command
-    #   run: ssh username@your_server_ip 'bash -s' < ./deploy_script.sh  # Optional, if you need to run a script on the server after copying files
+      - name: Copy archive via SCP
+        run: |
+          echo "Copying archive via SCP"
+          scp -o StrictHostKeyChecking=no -P 21098 deploy.tar.gz benmbrym@68.65.122.80:/home/benmbrym/deploy.tar.gz
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
+      - name: Extract archive on server
+        run: |
+          echo "Extracting archive on server"
+          ssh -o StrictHostKeyChecking=no -p 21098 benmbrym@68.65.122.80 'tar xzf /home/benmbrym/deploy.tar.gz -C /home/benmbrym/test && rm /home/benmbrym/deploy.tar.gz'
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
+      - name: SSH Command (Optional)
+        run: |
+          echo "Running SSH command"
+          ssh -o StrictHostKeyChecking=no -p 21098 benmbrym@68.65.122.80 'bash -s' < ./deploy_script.sh  # Optional, if you need to run a script on the server after extracting files
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
