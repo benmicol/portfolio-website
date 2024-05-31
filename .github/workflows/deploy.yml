@@ -3,7 +3,7 @@ name: Deploy HTML to Server
 on:
   push:
     branches:
-      - master # Change to your default branch if different
+      - master
 
 jobs:
   deploy:
@@ -22,7 +22,7 @@ jobs:
       - name: Archive files
         run: |
           echo "Archiving files"
-          tar czf deploy.tar.gz .
+          tar --exclude='.git*' --exclude='deploy.tar.gz' -czf deploy.tar.gz -C ${{ github.workspace }} .
 
       - name: Copy archive via SCP
         run: |
