@@ -19,7 +19,7 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Copy files via SCP
-        run: scp -o StrictHostKeyChecking=no -P 21098 -r / benmbrym@68.65.122.80:/home/benmbrym/test
+        run: scp -o StrictHostKeyChecking=no -P 21098 -r ./ benmbrym@68.65.122.80:/home/benmbrym/test
 
     # - name: SSH Command
     #   run: ssh username@your_server_ip 'bash -s' < ./deploy_script.sh  # Optional, if you need to run a script on the server after copying files
